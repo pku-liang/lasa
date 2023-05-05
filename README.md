@@ -56,7 +56,7 @@ The environment setting file is in `setenv.sh`:
          Board Package: $HOME/intelFPGA_pro/19.1/hld/board/a10_ref
   ```
 
-  There are 1 board package and 2 boards in this case, and you should set `FPGA_BOARD_PACKAGE=a10_ref`, and `export FPGA_BOARD=a10gx`.
+  There are 1 board package and 2 boards in this case, and you should set `FPGA_BOARD_PACKAGE=a10_ref` and `export FPGA_BOARD=a10gx`.
 
 3. Build Lasa
   ```
