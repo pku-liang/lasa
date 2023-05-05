@@ -2,7 +2,7 @@
 
 function show_usage {
     echo "Usage:"
-    echo "  ./install-tool.sh m4|gmp|mpfr|mpc|cmake|gcc|llvm-clang|python-packages|cm|git-lfs|ninja|re2c|oneapi-esimd|oneapi-support"
+    echo "  ./install-tool.sh m4|gmp|mpfr|mpc|cmake|gcc|llvm-clang|python-packages|git-lfs|ninja|re2c"
 }
 
 # No matter the script is sourced or directly run, BASH_SOURCE is always this script, and $1 is the
