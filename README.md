@@ -1,11 +1,14 @@
-# Introduction
+# Lasa
+A Framework for Productive and Performant Linear Algebra on FPGAs
+
+## Introduction
 Linear algebra can often be significantly expedited by spatial accelerators on FPGAs. As a broadly-adopted linear algebra library, BLAS requires extensive optimizations for routines that vary vastly in data reuse, bottleneck resources, matrix storage layouts, and data types. Existing solutions are stuck in the dilemma of productivity and performance. 
 
 We introduce Lasa, a framework composed of a programming model and a compiler, that addresses the dilemma by abstracting (for productivity) and specializing (for performance) the architecture of a spatial accelerator. Lasa abstracts a compute and its I/O as two dataflow graphs. A compiler maps the graphs onto systolic arrays and a customized memory heirarchy. The compiler further specializes the architecture transparently. In this framework, we develop 14 key BLAS routines, and demonstrate performance in parity with expert-written HLS code for BLAS level 3 routines, >=80% machine peak performance for level 2 and 1 routines, and 1.6X-7X speed up by taking advantage of matrix properties of symmetry, triangularity and bandness.
 
 This project is built upon [T2SP](https://github.com/IntelLabs/t2sp).
 
-# Installation
+## Installation
   
 1. Download [Intel FPGA SDK for OpenCL](http://dl.altera.com/opencl/), and install with
   ```
@@ -61,7 +64,7 @@ The environment setting file is in `setenv.sh`:
   make -j
   ```
 
-# Usage
+## Usage
 
 Run a specific test:
   ```
@@ -78,7 +81,7 @@ Run all the tests (for correctness only):
   ./tests.sh
   ``` 
 
-# Publications
+## Publications
 
 + **Lasa: Abstraction and Specialization for Productive and Performant Linear Algebra on FPGAs**. 
 Xiaochen Hao, Mingzhe Zhang, Ce Sun, Zhuofu Tao, Hongbo Rong, Yu Zhang, Lei He, Eric Petit, Wenguang Chen, Yun Liang. FCCM, 2023.
