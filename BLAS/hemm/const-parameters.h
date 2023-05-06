@@ -1,5 +1,4 @@
-#ifndef GEMM_CONST_PARAMS_H
-#define GEMM_CONST_PARAMS_H
+#pragma once
 
 // Inner loop bounds, which are static constant parameters of the design
 #ifdef GPU
@@ -32,6 +31,4 @@
         #define II          32
         #define KK          32
     #endif
-#endif
-
 #endif

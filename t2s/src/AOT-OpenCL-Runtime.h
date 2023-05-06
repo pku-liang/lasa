@@ -2429,6 +2429,7 @@ extern int32_t halide_device_and_host_malloc(void *, struct halide_buffer_t *, s
 extern struct halide_device_interface_t const *halide_opencl_device_interface();
 extern int32_t halide_opencl_wait_for_kernels_finish(void *);
 extern void halide_device_and_host_free_as_destructor(void *, void *);
+extern void halide_device_free_as_destructor(void *, void *);
 extern void halide_device_host_nop_free(void *, void *);
 
 #define CHECK(status)                                       \

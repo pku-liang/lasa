@@ -55,7 +55,7 @@ function test_fpga_kernel {
 }
 
 function generate_test_fpga_kernel {
-    source ../../../setenv.sh
+    source ../setenv.sh
     cd $workload
     if [ "$target" == "s10" -a "$size" == "LARGE" ]; then
         size="S10"

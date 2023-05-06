@@ -49,6 +49,10 @@ bool CodeGen_Clear_OpenCL_Dev::CodeGen_Clear_OpenCL_C::is_standard_opencl_type(T
             (bits == 32) || (bits == 64)) {
             standard_bits = true;
         }
+    } else if (type.is_complex()) {
+        if (bits == 64 || bits == 128) {
+            standard_bits = true;
+        }
     } else {
         if ((bits == 1 && lanes == 1) || (bits == 8) ||
             (bits == 16) || (bits == 32) || (bits == 64)) {
@@ -1516,6 +1520,22 @@ void CodeGen_Clear_OpenCL_Dev::CodeGen_Clear_OpenCL_C::visit_binop(Type t, Expr 
         }
         oss << "}";
         set_latest_expr(t, oss.str());
+    }
+}
+
+void CodeGen_Clear_OpenCL_Dev::CodeGen_Clear_OpenCL_C::visit(const Add *op) {
+    if (op->type.is_complex() && op->type.lanes() > 1) {
+        auto t = op->type;
+        auto a = op->a;
+        auto b = op->b;
+        std::ostringstream oss;
+        string sa = print_expr(a);
+        string sb = print_expr(b);
+
+        oss << "(" << print_type(t) << "){" << sa << ".t + " << sb << ".t}";
+        set_latest_expr(t, oss.str());
+    } else {
+        visit_binop(op->type, op->a, op->b, "+");
     }
 }
 

@@ -315,6 +315,12 @@ WEAK int32_t halide_device_and_host_free(void *user_context, void *obj) {
 WEAK void halide_device_and_host_free_as_destructor(void *user_context, void *obj) {
 }
 
+/** Free any device memory associated with a halide_buffer_t and ignore any
+ * error. Used when freeing as a destructor on an error. */
+WEAK void halide_device_free_as_destructor(void *user_context, void *obj) {
+    // TODO
+}
+
 // Return execution time in nanoseconds, as well as the start and end time in nanoseconds
 double compute_kernel_execution_time(cl_event &event, double &start_d, double &end_d) {
     cl_ulong start, end;

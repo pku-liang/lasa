@@ -1143,7 +1143,9 @@ public:
             in_function = true;
             on_device = false;
             unrolled_loops.clear();
-            current_loop.clear();
+            // The initial value of current_loop should be "outermost loop"
+            // to handle functions without any loops.
+            current_loop = op->name + ".s0.__outermost";
             loop_enclosing_mem_channel_access.clear();
             num_mem_channel_accesses = 0;
             path_condition = const_true();

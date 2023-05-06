@@ -199,6 +199,7 @@ protected:
         void visit(const Cast *op) override;
         void visit(const Select *op) override;
         void visit(const IfThenElse *op) override;
+        void visit(const Add *) override;
         void visit(const Mul *) override;
         void visit(const EQ *) override;
         void visit(const NE *) override;

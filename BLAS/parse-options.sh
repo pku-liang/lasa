@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function show_usage {
-   echo "Options: (gemm|trmm|syrk|syr2k|hemm|gemv|trmv|symv|ger) (a10|s10) (tiny|large) (hw|emulator) [bitstream]"
+   echo "Options: (gemm|trmm|syrk|syr2k|hemm|herk|her2k|gemv|trmv|symv|ger|dot) (a10|s10) (tiny|large) (hw|emulator) [bitstream]"
 }
 
 if [ $0 == $BASH_SOURCE ]; then
@@ -11,7 +11,7 @@ fi
 
 wrong_options=1
 
-if [ "$1" != "gemm" -a "$1" != "trmm" -a "$1" != "syrk" -a "$1" != "syr2k" -a "$1" != "hemm" -a "$1" != "gemv" -a "$1" != "trmv" -a "$1" != "symv" -a "$1" != "ger" ]; then
+if [[ ! "$1" =~ ^(gemm|trmm|syrk|syr2k|hemm|herk|her2k|gemv|trmv|symv|ger|dot)$ ]]; then
     show_usage
     return
 else

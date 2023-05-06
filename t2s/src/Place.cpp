@@ -1107,6 +1107,18 @@ Stmt replace_references_with_channels(Stmt s, const std::map<std::string, Functi
     return s;
 }
 
+class GetAllRealize : public IRVisitor {
+  public:
+    vector<string> realizes;
+    GetAllRealize() : realizes{} {}
+  private:
+    using IRVisitor::visit;
+    void visit(const Realize* op) override {
+        realizes.push_back(op->name);
+        op->body.accept(this);
+    }
+};
+
 Stmt replace_references_with_mem_channels(Stmt s, const std::map<std::string, Function> &env,
                                         map<string, Place> &funcs_using_mem_channels,
                                         vector<std::pair<string, Expr>> &letstmts_backup) {
@@ -1142,6 +1154,23 @@ Stmt replace_references_with_shift_registers(Stmt s, const map<string, Function>
     ReplaceReferencesWithShiftRegisters replacer(reg_size_map);
     s = replacer.mutate(s);
     return s;
+}
+
+void add_reference_names(const Stmt &s, const map<string, Function> &env, std::map<std::string, RegBound> &reg_size_map) {
+    GetAllRealize visitor{};
+    s.accept(&visitor);
+
+    for (const auto &merged_func_name : visitor.realizes) {
+        Function merged_func;
+        if (function_is_in_environment(merged_func_name, env, merged_func)
+            && (merged_func.definition().schedule().is_merged() || merged_func.has_merged_defs())
+            && !merged_func.definition().schedule().is_output()
+            && !merged_func.definition().schedule().is_input()
+            && merged_func.place() == Place::Device
+            && reg_size_map.find(merged_func_name) == reg_size_map.end()) {
+            reg_size_map.emplace(merged_func_name, RegBound{});
+        }
+    }
 }
 
 Stmt insert_fpga_reg(Stmt s, const map<string, Function> &env) {

@@ -664,9 +664,18 @@ class RealizeOnFPGA
                 << "Currently we only support packing one dimension as a vector\n";
             Var v_width = c.stensors[i].v_width[0];
             if (fv.exists(v_width)) {
-                funcs[i].vectorize(v_width);
-                debug(1) << "T2X emits: " << funcs[i].name() << ".vectorize("
-                         << v_width << ");\n";
+                const auto &dims = funcs[i].function().definition().schedule().dims();
+                const auto iter = std::find_if(dims.begin(), dims.end(), [](const Dim &d){
+                    return d.for_type == ForType::Vectorized;
+                });
+                if (iter != dims.end() && iter->var != v_width.name() && !ends_with(iter->var, "." + v_width.name())) {
+                    user_warning << "Func " << funcs[i].name() << " can't vectorize across "
+                                 << v_width <<", because Func is already vectorized across " << iter->var << "\n";
+                } else {
+                    debug(1) << "T2X emits: " << funcs[i].name() << ".vectorize("
+                            << v_width << ");\n";
+                    funcs[i].vectorize(v_width);
+                }
             }
         }
 
@@ -675,9 +684,18 @@ class RealizeOnFPGA
         if (!c.is_output && last_stensor.v_width.size() > 0) {
             Var last_width = last_stensor.v_width[0];
             Func main_func = fv.find_main_ure(c.outf);
-            main_func.vectorize(last_width);
-            debug(1) << "T2X emits: " << main_func.name() << ".vectorize("
-                     << last_width << ");\n";
+            const auto &dims = main_func.function().definition().schedule().dims();
+            const auto iter = std::find_if(dims.begin(), dims.end(), [](const Dim &d){
+                return d.for_type == ForType::Vectorized;
+            });
+            if (iter != dims.end() && iter->var != last_width.name() && !ends_with(iter->var, "." + last_width.name())) {
+                user_warning << "Func " << main_func.name() << " can't vectorize across "
+                             << last_width <<", because Func is already vectorized across " << iter->var << "\n";
+            } else {
+                debug(1) << "T2X emits: " << main_func.name() << ".vectorize("
+                        << last_width << ");\n";
+                main_func.vectorize(last_width);
+            }
         }
     }
 
@@ -698,7 +716,7 @@ class RealizeOnFPGA
                     auto ext_node = bound.second.as<IntImm>();
                     internal_assert(ext_node);
                     int num_banks = (ext_node->value * type.bits()) / 512;
-                    if (num_banks > 1) {
+                    if (num_banks > 1 && v_width.name() == main_ure.function().definition().schedule().dims()[0].var) {
                         internal_assert(c.imp.size() == 1);
                         funcs[i-1].partition(c.imp[0], funcs[i], v_width, num_banks);
                         debug(1) << "T2X emits: " << funcs[i-1].name() << ".partition("
@@ -778,16 +796,18 @@ class RealizeOnFPGA
                 auto ori_ext = simplify(bound.second + bound.first);
                 auto remove_dims = f.function().definition().schedule().remove_params();
                 Var inner(dims[i].var);
-                if (std::find(remove_dims.begin(), remove_dims.end(), min_var->name) == remove_dims.end()) {
-                    // If the outer triangular loop is not removed, we set the storage bound as the half
-                    f.bound_storage(inner, 0, ori_ext/2+1);
-                    debug(1) << "T2X emits: " << f.name() << ".bound_storage("
-                             << inner.name() << ", 0, " << ori_ext << "/2+1);\n";
-                } else {
-                    // If the outer triangular loop is removed, we set the storage bound as its original bound
-                    f.bound_storage(inner, 0, ori_ext);
-                    debug(1) << "T2X emits: " << f.name() << ".bound_storage("
-                             << inner.name() << ", 0, " << ori_ext << ");\n";
+                if (std::find(remove_dims.begin(), remove_dims.end(), inner.name()) == remove_dims.end()) {
+                    if (std::find(remove_dims.begin(), remove_dims.end(), min_var->name) == remove_dims.end()) {
+                        // If the outer triangular loop is not removed, we set the storage bound as the half
+                        f.bound_storage(inner, 0, ori_ext/2+1);
+                        debug(1) << "T2X emits: " << f.name() << ".bound_storage("
+                                 << inner.name() << ", 0, " << ori_ext << "/2+1);\n";
+                    } else {
+                        // If the outer triangular loop is removed, we set the storage bound as its original bound
+                        f.bound_storage(inner, 0, ori_ext);
+                        debug(1) << "T2X emits: " << f.name() << ".bound_storage("
+                                 << inner.name() << ", 0, " << ori_ext << ");\n";
+                    }
                 }
             }
         }

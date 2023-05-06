@@ -26,13 +26,16 @@ cd $PATH_TO_SCRIPT
 
 # FPGA: Verify correctness with tiny problem sizes and emulator
 ./test.sh gemm $target tiny emulator
-./test.sh hemm $target tiny emulator
 ./test.sh trmm $target tiny emulator
 ./test.sh syrk $target tiny emulator
 ./test.sh syr2k $target tiny emulator
+./test.sh hemm $target tiny emulator
+./test.sh herk $target tiny emulator
+./test.sh her2k $target tiny emulator
 ./test.sh gemv $target tiny emulator
 ./test.sh trmv $target tiny emulator
 ./test.sh symv $target tiny emulator
 ./test.sh ger $target tiny emulator
+./test.sh dot $target tiny emulator
 
 cd $cur_dir

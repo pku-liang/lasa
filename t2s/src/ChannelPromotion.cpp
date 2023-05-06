@@ -445,7 +445,16 @@ class ChannelPromotor : public IRMutator {
                 && extract_first_token(op->name) == extract_first_token(c.promotion_loop)) {
                 // Declare the channel array inner the run_on_device loop
                 internal_assert(channel2type.find(c.name) != channel2type.end());
-                loop = Realize::make(c.name+".array", {channel2type.at(c.name)}, MemoryType::Auto, {}, const_true(), loop);
+                // No other loop in this function.
+                const bool only_one_loop = ends_with(c.promotion_loop, "__innermost")
+                                           && op->name == remove_postfix(c.promotion_loop, "__innermost");
+                if (only_one_loop) {
+                    loop = make_channel_access(c, loop);
+                }
+                loop = Realize::make(c.name + ".array", {channel2type.at(c.name)}, MemoryType::Auto, {}, const_true(), loop);
+                if (only_one_loop) {
+                    continue;
+                }
             }
             if (c.promotion_loop == op->name) {
                 // Make channel accesses out of the promotion loop

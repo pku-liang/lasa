@@ -70,7 +70,7 @@ Run a specific test:
   ```
   source ./setenv.sh
   cd BLAS
-  ./test.sh (gemm|trmm|syrk|syr2k|hemm|gemv|trmv|symv|ger) (a10|s10) (tiny|large) (hw|emulator) [bitstream]
+  ./test.sh (gemm|trmm|syrk|syr2k|hemm|herk|her2k|gemv|trmv|symv|ger|dot) (a10|s10) (tiny|large) (hw|emulator) [bitstream]
   ```
 
 For example, `./test.sh gemm a10 large hw` to synthesize and run our GEMM design.  
@@ -78,7 +78,7 @@ For example, `./test.sh gemm a10 large hw` to synthesize and run our GEMM design
 
 Run all the tests (for correctness only):
   ```
-  ./tests.sh
+  ./tests.sh (a10|s10)
   ``` 
 
 ## Publications

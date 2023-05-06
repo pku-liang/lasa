@@ -1169,7 +1169,7 @@ public:
                         Expr v = Variable::make(Int(32), op->name+".s0."+params[0].src_vars[i]);
                         PE_dims.push_back(v);
                     }
-                    decide_shift_reg_alloc_for_unscheduled_stt(func_name, func, deps, all_loop_vars, PE_dims, vectorized_loop_var,
+                    decide_shift_reg_alloc_for_unscheduled_stt(func_name, func, deps, all_loop_vars, all_unrolled_loop_vars, vectorized_loop_var,
                                                                loop_mins, loop_extents, global_min, global_max, alloc);
                     func_to_regalloc[func_name] = std::move(alloc);
                 }

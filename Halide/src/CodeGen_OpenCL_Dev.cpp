@@ -49,6 +49,10 @@ bool CodeGen_OpenCL_Dev::CodeGen_OpenCL_C::is_standard_opencl_type(Type type) {
             (bits == 32) || (bits == 64)) {
             standard_bits = true;
         }
+    } else if (type.is_complex()) {
+        if (bits == 64 || bits == 128) {
+            standard_bits = true;
+        }
     } else {
         if ((bits == 1 && lanes == 1) || (bits == 8) ||
             (bits == 16) || (bits == 32) || (bits == 64) || (bits == 128)) {
@@ -1540,6 +1544,57 @@ void CodeGen_OpenCL_Dev::CodeGen_OpenCL_C::visit_binop(Type t, Expr a, Expr b, c
         }
         oss << "};\n";
         print_assignment(t, oss.str());
+    }
+}
+
+void CodeGen_OpenCL_Dev::CodeGen_OpenCL_C::visit(const Add *op) {
+    if (op->type.is_complex() && op->type.lanes() > 1) {
+        auto t = op->type;
+        auto a = op->a;
+        auto b = op->b;
+        std::ostringstream oss;
+        string sa = print_expr(a);
+        string sb = print_expr(b);
+
+        oss << "(" << print_type(t) << "){" << sa << ".t + " << sb << ".t}";
+        print_assignment(t, oss.str());
+    } else {
+        visit_binop(op->type, op->a, op->b, "+");
+    }
+}
+
+void CodeGen_OpenCL_Dev::CodeGen_OpenCL_C::visit(const Mul *op) {
+    if (op->type.is_complex()) {
+        auto t = op->type;
+        auto a = op->a;
+        auto b = op->b;
+        std::ostringstream oss;
+        string sa = print_expr(a);
+        string sb = print_expr(b);
+        if (op->type.lanes() == 1) {
+            oss << "(" << (t.bits() == 64 ? "complex" : "complexd") << ") {"
+                << sa << ".s0 * " << sb << ".s0 - " << sa << ".s1 * " << sb << ".s1" << ", "
+                << sa << ".s0 * " << sb << ".s1 + " << sa << ".s1 * " << sb << ".s0" << "}";
+        } else {
+            internal_assert(t.is_vector() && a.type().is_vector() && t.lanes() == a.type().lanes());
+            oss << "(" << print_type(t) << ")" << "(" << (t .bits() == 64 ? "float" : "double")
+                << 2 * t.lanes() << ") {"
+                << sa << ".t.s0 * " << sb << ".t.s0 - " << sa << ".t.s1 * " << sb << ".t.s1" << ", "
+                << sa << ".t.s0 * " << sb << ".t.s1 + " << sa << ".t.s1 * " << sb << ".t.s0";
+            for (int i = 1; i < t.lanes(); i++) {
+                const string first = vector_index_to_string(2 * i);
+                const string second = vector_index_to_string(2 * i + 1);
+                oss << ", "
+                    << sa << ".t.s" << first << " * " << sb << ".t.s" << first
+                    << " - " << sa << ".t.s" << second << " * " << sb << ".t.s" << second
+                    << ", "
+                    << sa << ".t.s" << first << " * " << sb << ".t.s" << second
+                    << " + " << sa << ".t.s" << second << " * " << sb << ".t.s" << first;
+            }
+        }
+        print_assignment(t, oss.str());
+    } else {
+        visit_binop(op->type, op->a, op->b, "*");
     }
 }
 
