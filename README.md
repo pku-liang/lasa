@@ -85,3 +85,7 @@ Run all the tests (for correctness only):
 
 + **Lasa: Abstraction and Specialization for Productive and Performant Linear Algebra on FPGAs**. 
 Xiaochen Hao, Mingzhe Zhang, Ce Sun, Zhuofu Tao, Hongbo Rong, Yu Zhang, Lei He, Eric Petit, Wenguang Chen, Yun Liang. FCCM, 2023.
+
++ **SuSy: a programming model for productive construction of high-performance systolic arrays on FPGAs**. 
+Yi-Hsiang Lai, Hongbo Rong, Size Zheng, Weihao Zhang, Xiuping Cui, Yunshan Jia, Jie Wang, Brendan Sullivan, Zhiru Zhang, Yun Liang, Youhui Zhang, Jason Cong, Nithin George, Jose Alvarez, Christopher Hughes, and Pradeep Dubey. 2020.  ICCAD'20. [Link](https://ieeexplore.ieee.org/document/9256583)
+
